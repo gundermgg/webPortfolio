@@ -1,0 +1,192 @@
+//This project started as a 2-motor RPM data collection sensor for the NGUAV, and I recently deleted the second motor and added the pitot tube with a running-average filter on the signal. I plan to add GPS and (possibly) angular accelerations to the data.
+
+#include <SD.h>
+File mySdCard;  //This is the object used for reading the sd card
+unsigned long current_Millis = 0;
+unsigned long previous_Millis = 0;
+int poles = 12;  //Number of poles the motor has. Once the program starts, this is a constant
+float rps0 = 0;
+float rps1 = 0;
+float rpm0 = 0;
+float rpm1 = 0;
+float seconds = 0;
+float st_conv = 1000;
+int timer = 0;
+int calculation_period = 100; //this is the time-resolution of the rpm calculation in milliseconds
+unsigned long pulse_counter0 = 0;
+unsigned long pulse_counter1 = 0;
+const byte interruptPin0 = 2;
+bool initialize_Motor = false;
+bool beginProgram = false;
+float MET = 0; // This is the mission elapsed timer in seconds
+const int controlPin = 7;
+
+////// PITOT TUBE ///////////
+  //Reads the analog output signal from the MPXV7002DP, which is hooked up to a pitot tube.
+
+  // These constants won't change. They're used to give names to the pins used:
+  const int analogInPin = A0;  // Analog input pin that the potentiometer is attached to
+
+  int sensorValue = 0;  // value read from the Pitot
+  int outputValue = 0;  // value output to the PWM (analog out)
+  const float dens = .8194; // air density at 4k feet, kg/m^3
+  //const int filter_count = 10;
+
+  //For Filtering:
+  const int numReadings = 200;  // Number of samples for the average
+  int readings[numReadings];      // the readings from the analog input
+  int readIndex = 0;              // the index of the current reading
+  int total = 0;                  // the running total
+  int avgairspd = 0;                // the average Air Speed
+  ///////////////
+
+
+void setup() {
+  Serial.begin(19200);           //  setup serial
+
+  ////// RPM Counter Setup ////////////
+    pinMode(interruptPin0, INPUT);
+    attachInterrupt(digitalPinToInterrupt(interruptPin0), count0, RISING);  //Note the use of digitalpintoInterrupt to find the actual interrup number for pin 2
+
+  /////// SD Card Management ////////////
+    pinMode(controlPin, INPUT); // Used to control when to close the SD Card file //
+    Serial.print("Initializing SD card...");
+    pinMode(10, OUTPUT); //This is used as the chipSelect port for the SD reader. 
+  
+    if (!SD.begin(10)) {
+      Serial.println("initialization failed!");
+      return;
+    }
+    Serial.println("initialization done.");
+  
+    // open the file. note that only one file can be open at a time,
+    // so you have to close this one before opening another.
+    mySdCard = SD.open("dataLog0.txt", FILE_WRITE);
+
+    if (mySdCard) {
+      Serial.print("Writing to sd card...");
+      beginProgram = true;
+
+    }
+
+    else {
+      // if the file didn't open, print an error:
+      Serial.println("error opening test.txt");
+      beginProgram = false;
+    }
+
+  /////////// PITOT TUBE FILTERING //////////
+    // Ahead of filtering, Initialize all the readings to 0:
+    for (int thisReading = 0; thisReading < numReadings; thisReading++) {
+      readings[thisReading] = 0;
+    }
+}
+
+void loop() {
+  
+  ///////////// Record MET ////////////////
+  mySdCard.print(MET);
+  mySdCard.print(",");
+  
+  //////////// Counts RPM for one motor ////////////////
+  
+  if (beginProgram) {
+    Serial.println("Starting Program, counting RPMs");
+     seconds = (calculation_period / st_conv); // This is the length of the calculation period. Once the program is running, it is a constant.
+  current_Millis = millis();
+
+  if ((current_Millis - previous_Millis) > calculation_period) {  //This resents and starts the function when the "timer" or "millis" reaches the calculation period.
+    previous_Millis = millis();
+    
+    rps0 = pulse_counter0 / ((poles) * seconds);    // Every time the timer maxes out, it divides the 
+    rpm0 = rps0 * 60;          //
+
+    MET = current_Millis / st_conv;
+
+    Serial.println(rpm0);    //This spits out the rpm value over the serial port
+    Serial.print(",");
+    
+    mySdCard.print(rpm0);
+    mySdCard.print(",");
+    pulse_counter0 = 0; //After doing the necessary calculations, this sets the incremental pulse count to zero.
+    
+    }
+  }
+
+  //////////// PITOT TUBE DATA//////////
+    // read the analog in value:
+  sensorValue = analogRead(analogInPin);
+
+  // print the results to the Serial Monitor:
+  //Serial.print("\nsensor = ");
+  Serial.print("\n");
+
+  //Convert sensor reading to a pressure
+  float diffPress = convertToPressure(sensorValue);
+  //Convert pressure to speed
+  float speed = convertPresstoSpeed(diffPress);
+  speed = speed * 2.237; //Convert m/s to mph
+  Serial.print("   ");
+  Serial.print("Speed (mph):");
+  Serial.print(speed);
+  Serial.print("   ");
+  Serial.print("Max:");
+  int max = 100;
+  Serial.print (max); //Keeps the serial monitor scaled appropriately
+
+  /////////////FILTER PITOT TUBE DATA//////////////////////////
+  ///*
+  // Subtract the last reading:
+  total = total - readings[readIndex];
+  // Read from the sensor:
+  readings[readIndex] = speed; // Assuming sensor is connected to A0
+  // Add the reading to the total:
+  total = total + readings[readIndex];
+  // Advance to the next position in the array:
+  readIndex = (readIndex + 1) % numReadings;
+  
+  // Calculate the average:
+  avgairspd = total / numReadings;
+  
+  // Send the result to the Serial Monitor:
+  Serial.print("   Average Airspeed: ");
+  Serial.print(avgairspd);
+
+  // Log it
+  //mySdCard.print("avgairspd");
+  //mySdCard.print(",");
+  mySdCard.println(avgairspd);
+  //mySdCard.print(",");
+
+
+/////////////// Close The SD Card File: ////////////
+  if ((digitalRead(controlPin)) == LOW){
+    // Do it:
+      mySdCard.close();
+      Serial.println(" SD Card Closed.");
+      beginProgram = false;
+  }
+
+}
+
+void count0() {      //So this function activates every time there is a pulse in the sensor's digital input. It increases the number of pulses counted in a given time increment.
+  pulse_counter0++;
+  
+}
+void count1() {      //So this function activates every time there is a pulse in the sensor's digital input. It increases the number of pulses counted in a given time increment.
+  pulse_counter1++;
+
+  }
+
+float convertToPressure(float value) { //For the Pitot Tube
+  float pressure = 5 * (value / 1025) - 2.5;
+  float pressureCorrection = - 0.16; //Calibration for sensor error.  -.16 originally
+  pressure = pressure + pressureCorrection;
+  pressure = pressure * 1000;
+  return pressure; //Returns in kPa
+}
+
+float convertPresstoSpeed(float value) { ////For the Pitot Tube
+  float mps = sqrt((2 * value) / dens);
+  return mps;
+}
