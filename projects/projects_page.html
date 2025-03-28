@@ -1,0 +1,127 @@
+<html>
+<head>
+<title>[Gunderspace] - portfolio</title>
+<style>
+body { 
+    background: #1a1a1a; 
+    color: #d3d3d3; 
+    font-family: 'Consolas', monospace; 
+    margin: 10px; 
+    font-size: 14; /* Adjust this number to taste. EXPERIMENTAL */
+}
+a { 
+    color: #b19cd9; 
+    text-decoration: none; 
+}
+a:hover { 
+    background: #b19cd9; 
+    color: #1a1a1a; 
+}
+h1 { /*MY NAME*/
+    color: #b19cd9; 
+    font-family: 'Consolas', monospace;
+    font-size: 1.7vw;
+    margin: 0;
+}
+h2 { /*Blog Title*/
+    color: #fff; 
+    font-family: 'Consolas', monospace;*/ 
+    font-size: vw; /* Adjust this number to taste */
+}
+.project { 
+    margin: 20px 0; 
+    font-family: 'Consolas', monospace; 
+    border-left: 2px solid #b19cd9; 
+    padding-left: 10px; 
+    font-size: 14; /* Adjust this number to taste */
+    max-width: 90ch; /* Limits line length to ~70 characters, readable */
+}
+</style>
+</head>
+<body>
+<pre>
+<h1>M. Gunderman</h1>
+airplanes | rockets | cars | other
+____________________________________________________________________________________
+
+
+My name is Michael Gunderman.
+I'm currently a senior mechanical engineer at Stratolaunch, where I work on <a href="https://www.stratolaunch.com/vehicles/talon-a/">Talon-A.</a>
+
+<a href="../index.html">Home</a>
+<a href="../blogs/blog_page.html">Blogs</a>
+
+<h2>side projects</h2>
+<div class="project">
+    > Arduino instro
+    Project to make a data collection unit (GPS data, motor RPM, and pitot tube) with an arduino nano. I'm building
+    this to combine with a project to build a small, fast EDF-powered plane. I'm doing this because I have a lot of
+    models estimating the performance of electric aircraft, and while I have built a ton of RC airplanes, I'm looking
+    for more specific information. I honestly could have used a pixhawk for this purpose, but where's the fun in that?
+    <a href="Arduino Instro/250223 combined_v1.txt" target="_blank">code</a> | <a href="Arduino Instro/data_duino.jpg" target="_blank">img</a>
+</div>
+<div class="project">
+    > Electric Aircraft Performance Studies (2024 - Present)
+    One of my friends posted something online that sounded overly optimistic, so I went down a small rabbit hole.
+    These are performance trades to understand the capabilities of GA and commercial electric aircraft with current tech.
+    <a href="Electric AC Perf Studies/trades.xlsx" target="_blank">Analysis</a> | <a href="Electric AC Perf Studies/240701 Design Study Notes.pdf" target="_blank">Notes/Ramblings</a>
+</div>
+<div class="project">
+    > "Igloo 23 VTOL" (2020)
+    I ran out of time to finish flight-testing the Gemini V2 project before graduation, but I was able to borrow a bunch
+    of the hardware (motors and such). I slapped it onto a foamboard RC plane I built, upgraded the motor mounting arms
+    with fiberglass "arms" and 3d printed motor mounts. I was able to do a bunch of flight testing to mature the flight
+    controls I originally developed for the Gemini V2. This is also where I originally made the initial version of my
+    arduino instro for measuring motor RPMs for the front and rear motors. Based on that data and the published information
+    on our propellers, I was looking to come up with crude aerodynamic performance estimates. That wasn't very useful for
+    the Igloo 23 specifically, but would have been very cool for use with the Gemini V2! After
+    that project, I returned those motors 
+    <a href="NGUAV/Project Summary & Lessons Learned.pdf" target="_blank">Project Summary</a> | <a href="NGUAV/Igloo 23 Airborne.png" target="_blank">img_airborne</a> | <a href="projects/NGUAV/Igloo 23 Image.jpg" target="_blank">img</a> | <a href="projects/NGUAV/Igloo Demonstrator_with_Wiring_above 4-12-2020.JPG" target="_blank">CAD_img</a>
+</div>
+<div class="project">
+    > Solar EVTOL Gemini V2 (2019)
+    2019 Project to modify a Gemini V2 with VTOL and Solar Capability for the Ohio State Space Grant Consortium.
+    I did lots of electrical/mechanical integration and a custom Pixhawk firmware build. We built 20-lb, 10ft wingspan
+    plane in a semester. I was primarily concerned with integration of electrical systems (that was most of the project's
+    complexity), but also building the basic Gemini V2 kitplane and ensuring we had a flyable RC plane. I also did a bunch
+    of work to try to predict the cruise/hover performance we'd get. In the aircraft's final configuration, we did a
+    fixed-wing flight and a quick hover demonstration. Unfortunately ran out of time to tune the controller and explore its
+    capabilities, some of that work was furthered in the Igloo 23 VTOL project.
+    <a href="NGUAV/Gemini V2 VTOL Simulation Sheet.xlsx" target="_blank">Analysis</a> | <a href="NGUAV/Gemini V2.JPG" target="_blank">img</a> | <a href="NGUAV/Gemini V2_Airborne.png" target="_blank">img_airborne</a>
+</div>
+
+contact:
+<a href="mailto:gundermgg@gmail.com">gundermgg@gmail.com</a> | <a href="https://www.linkedin.com/in/michael-gunderman/">linkedin</a>
+</pre>
+</body>
+</html>
+
+<!--
+<div class="project">
+    > Edge 540 Project (2021)
+    project to build a highly-aerobatic balsa RC plane. This was partially built, but quality issues derailed the project.
+    <a href="projects/Edge 540/Dimensions and Design Analysis - EP.xlsx" target="_blank">Analysis</a> | <a href="projects/Edge 540/210705.png" target="_blank">img</a> | <a href="projects/Edge 540/XFLR5 Plots.png" target="_blank">XFLR5_Plots</a>
+</div>
+-->
+
+<!--
+<div class="project">
+    > "Roadster Project" (2023)
+    2020 study on building a car with the engine from my SUV
+    <a href="projects/Roadster/Chassis CAD Screenshot.png" target="_blank">CAD_img</a> | <a href="projects/Roadster/AR5 Roadster Gear Ratios.xlsx" target="_blank">Drivetrain Analysis</a>
+</div>
+<div class="project">
+    > Rocket Project (2020)
+    From 2020, project to build a biprop liquid engine, which I later abandoned
+    Analysis sheets below
+    <a href="projects/Rocket Project/Project Analysis.xlsx" target="_blank">Analysis</a> | <a href="projects/Rocket Project/Conical Nozzle 1st pass 11-8-2019.JPG" target="_blank">Eng_CAD_img</a>
+</div>
+-->
+
+<!--
+<div class="project">
+    > EDF Jet
+    Ongoing project to build a very fast rc airplane with the hardware on-hand. Plane is under construction.
+    <a href="projects/EDF Jet/CAD_img.png" target="_blank">CAD_img</a> | <a href="img/rocket.png" target="_blank">Analysis</a>
+</div>
+-->
